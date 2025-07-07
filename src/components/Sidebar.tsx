@@ -18,7 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, chats }) => (
     <div className="p-4 border-b flex items-center justify-between">
       <div className="flex items-center gap-3">
         <img
-          src={user.photoURL || "/avatar.png"}
+          src={user.photoURL || "/nouser.png"}
           alt="profile"
           className="w-10 h-10 rounded-full border"
         />
