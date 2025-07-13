@@ -32,6 +32,23 @@ export default function Step2Form() {
         displayName: `${firstName} ${lastName}`
       });
 
+
+      await fetch('/api/users/upsert', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    firebaseUid: user.uid,
+    email: user.email,
+    username: firstName.toLowerCase(),
+    fullName: `${firstName} ${lastName}`,
+    bio: '',
+    avatar: null,
+    phoneNumber: null
+ 
+  })
+});
+
+
       // 3. Send verification email with custom redirect
       const actionCodeSettings = {
         url: `http://localhost:3000/register/verify?email=${encodeURIComponent(email)}`,

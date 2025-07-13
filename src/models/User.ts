@@ -10,7 +10,6 @@ export interface IUser extends Document {
   phoneNumber: string | null;
   isOnline: boolean;
   lastSeen: Date;
-  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,10 +18,12 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
-    minlength: 3,
-    maxlength: 20
+  },
+  fullName: {
+    type: String,
+    required: true,
+    trim: true,
   },
   email: {
     type: String,
@@ -30,17 +31,18 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true
   },
-  password: {
+
+  firebaseUid: {
     type: String,
-    required: true,
-    minlength: 6
+    default: null,
   },
-  fullName: {
-    type: String,
-    required: true,
-    trim: true
-  },
+
   avatar: {
+    type: String,
+    default: null
+  },
+
+  phoneNumber: {
     type: String,
     default: null
   },
@@ -49,10 +51,8 @@ const userSchema = new mongoose.Schema({
     maxlength: 150,
     default: ""
   },
-  phoneNumber: {
-    type: String,
-    default: null
-  },
+
+
   isOnline: {
     type: Boolean,
     default: false
@@ -60,10 +60,6 @@ const userSchema = new mongoose.Schema({
   lastSeen: {
     type: Date,
     default: Date.now
-  },
-  isActive: {
-    type: Boolean,
-    default: true
   },
   createdAt: {
     type: Date,
@@ -77,7 +73,6 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Using type assertion for model to work with Next.js
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
 
 export default User;

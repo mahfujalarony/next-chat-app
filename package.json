@@ -11,6 +11,8 @@
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",
     "@reduxjs/toolkit": "^2.8.2",
+    "@tanstack/react-query": "^5.82.0",
+    "axios": "^1.10.0",
     "firebase": "^11.9.1",
     "formidable": "^3.5.4",
     "mongoose": "^8.16.1",
@@ -18,7 +20,9 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-firebase-hooks": "^5.1.1",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -26,6 +30,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/socket.io": "^3.0.2",
+    "@types/socket.io-client": "^3.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "tailwindcss": "^4",

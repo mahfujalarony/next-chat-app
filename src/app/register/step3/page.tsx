@@ -65,6 +65,16 @@ const Step3Form: React.FC = () => {
       // Update user profile with image URL in Firebase Authentication
       const user = auth.currentUser;
       if (user) {
+        // MongoDB-তে avatar update
+        await fetch('/api/users/upsert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firebaseUid: user.uid,
+            avatar: imageUrl
+          })
+        });
+
         await updateProfile(user, {
           photoURL: imageUrl,
         });
