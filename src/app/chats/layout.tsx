@@ -1,4 +1,4 @@
-import ChatList from '../../components/ChatListNew'; 
+import ChatList from '../../components/ChatList'; 
 
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {

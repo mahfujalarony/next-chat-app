@@ -1,6 +1,6 @@
 'use client';
 
-import ChatList from '../../components/ChatListNew'; // Import the ChatList component  
+import ChatList from '../../components/ChatList'; // Import the ChatList component  
 
 export default function ChatListPage() {
   return (

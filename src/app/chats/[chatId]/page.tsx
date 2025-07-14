@@ -83,7 +83,7 @@ export default function ChatPage({ params }: Props) {
   if (conversationLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-gray-500">চ্যাট লোড হচ্ছে...</div>
+        <div className="text-gray-500">Loading...</div>
       </div>
     );
   }
@@ -102,15 +102,15 @@ export default function ChatPage({ params }: Props) {
           {conversation?.type === 'direct' && (
             <p className="text-sm text-gray-500">
               {isOnline ? (
-                <span className="text-green-500">● অনলাইন</span>
+                <span className="text-green-500">●OnLine</span>
               ) : (
-                <span className="text-gray-400">● অফলাইন</span>
+                <span className="text-gray-400">●OffLine</span>
               )}
             </p>
           )}
           {conversation?.type === 'group' && (
             <p className="text-sm text-gray-500">
-              {conversation.participants.length} জন সদস্য
+              {conversation.participants.length} Member
             </p>
           )}
         </div>

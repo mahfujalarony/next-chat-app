@@ -12,6 +12,8 @@ const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
 });
 
+console.log("🌐 API Base URL:", apiClient.defaults.baseURL);
+
 // Types
 interface User {
   _id: string;
@@ -35,18 +37,39 @@ interface ChatMessagesProps {
 
 // Fetch functions
 const fetchMessages = async (conversationId: string): Promise<Message[]> => {
-  const { data } = await apiClient.get(`/messages/${conversationId}`);
-  return data.data;
+  console.log("🔍 Fetching messages for conversation:", conversationId);
+  try {
+    const { data } = await apiClient.get(`/messages/${conversationId}`);
+    console.log("✅ Messages fetched successfully:", data);
+    return data.data;
+  } catch (error) {
+    console.error("❌ Failed to fetch messages:", error);
+    throw error;
+  }
 };
 
 const fetchMyMongoId = async (firebaseUid: string): Promise<string> => {
-  const { data } = await apiClient.get(`/users/getMongoId/${firebaseUid}`);
-  return data.data.mongoId;
+  console.log("🔍 Fetching MongoDB ID for firebaseUid:", firebaseUid);
+  try {
+    const { data } = await apiClient.get(`/users/getMongoId/${firebaseUid}`);
+    console.log("✅ MongoDB ID fetched successfully:", data);
+    return data.data.mongoId;
+  } catch (error) {
+    console.error("❌ Failed to fetch MongoDB ID:", error);
+    throw error;
+  }
 };
 
 const fetchConversationDetails = async (conversationId: string) => {
-  const { data } = await apiClient.get(`/conversations/getConversationById/${conversationId}`);
-  return data.data;
+  console.log("🔍 Fetching conversation details for:", conversationId);
+  try {
+    const { data } = await apiClient.get(`/conversations/getConversationById/${conversationId}`);
+    console.log("✅ Conversation details fetched successfully:", data);
+    return data.data;
+  } catch (error) {
+    console.error("❌ Failed to fetch conversation details:", error);
+    throw error;
+  }
 };
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({ conversationId }) => {
@@ -58,16 +81,23 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ conversationId }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
+  console.log("🎯 ChatMessages component rendering with conversationId:", conversationId);
+  
   const firebaseUid = useSelector((state: any) => state.user.user?.uid);
+  const currentUser = useSelector((state: any) => state.user.user);
   const socket = useSocket();
   const queryClient = useQueryClient();
+  
+  console.log("🔍 Component state:", { firebaseUid, currentUser, socket: !!socket });
 
   // Fetch data
-  const { data: myMongoId } = useQuery({
+  const { data: myMongoId, error: mongoIdError } = useQuery({
     queryKey: ["mongoId", firebaseUid],
     queryFn: () => fetchMyMongoId(firebaseUid),
     enabled: !!firebaseUid,
   });
+
+  console.log("💾 MongoDB ID Query:", { myMongoId, mongoIdError, firebaseUid });
 
   const { data: messages = [], isLoading: messagesLoading, error: messagesError } = useQuery({
     queryKey: ["messages", conversationId],
@@ -76,11 +106,15 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ conversationId }) => {
     refetchInterval: 1000, // Refetch every second for real-time effect
   });
 
-  const { data: conversation, isLoading: convLoading } = useQuery({
+  console.log("📨 Messages Query:", { messagesCount: messages.length, messagesLoading, messagesError });
+
+  const { data: conversation, isLoading: convLoading, error: convError } = useQuery({
     queryKey: ["conversation", conversationId],
     queryFn: () => fetchConversationDetails(conversationId),
     enabled: !!conversationId,
   });
+
+  console.log("💬 Conversation Query:", { conversation, convLoading, convError });
 
   // Auto scroll to bottom
   const scrollToBottom = () => {
@@ -90,6 +124,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ conversationId }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Debug whoIsTyping state changes
+  useEffect(() => {
+    console.log("🔄 whoIsTyping state changed to:", whoIsTyping);
+  }, [whoIsTyping]);
 
   // Socket event listeners
   useEffect(() => {
@@ -105,15 +144,24 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ conversationId }) => {
 
     // Listen for typing indicators
     socket.on("user_typing", ({ userId, username }: { userId: string; username: string }) => {
+      console.log("👨‍💻 User typing received:", { userId, username, myMongoId });
+      console.log("👨‍💻 Current whoIsTyping state before:", whoIsTyping);
       if (userId !== myMongoId) {
+        console.log("✅ Setting whoIsTyping to:", username);
         setWhoIsTyping(username);
         setTimeout(() => setWhoIsTyping(null), 3000);
+      } else {
+        console.log("❌ Ignoring own typing event");
       }
     });
 
     socket.on("user_stopped_typing", ({ userId }: { userId: string }) => {
+      console.log("⏹️ User stopped typing received:", { userId, myMongoId });
       if (userId !== myMongoId) {
+        console.log("✅ Clearing whoIsTyping");
         setWhoIsTyping(null);
+      } else {
+        console.log("❌ Ignoring own stop typing event");
       }
     });
 
@@ -158,13 +206,16 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ conversationId }) => {
     setNewMessage(value);
 
     if (!socket || !myMongoId) return;
+    
+    const username = currentUser?.displayName || currentUser?.email || "Unknown User";
 
     if (value.length > 0 && !isTyping) {
       setIsTyping(true);
+      console.log("📤 Emitting typing event:", { conversationId, userId: myMongoId, username });
       socket.emit("typing", { 
         conversationId, 
         userId: myMongoId,
-        username: "You"
+        username: username
       });
     }
 
@@ -176,6 +227,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ conversationId }) => {
     // Set new timeout
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
+      console.log("📤 Emitting stop_typing event:", { conversationId, userId: myMongoId });
       socket.emit("stop_typing", { conversationId, userId: myMongoId });
     }, 1000);
   };

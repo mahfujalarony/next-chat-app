@@ -10,10 +10,19 @@ export const useSocket = () => {
     if (typeof window === 'undefined') return;
 
     const socketInstance = io("http://localhost:5000", {
-      autoConnect: false,
+      autoConnect: true,
     });
 
+    socketInstance.connect();
     setSocket(socketInstance);
+
+    socketInstance.on('connect', () => {
+      console.log('✅ Socket connected:', socketInstance.id);
+    });
+
+    socketInstance.on('disconnect', () => {
+      console.log('❌ Socket disconnected');
+    });
 
     // Cleanup
     return () => {
