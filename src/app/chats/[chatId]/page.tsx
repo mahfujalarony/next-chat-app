@@ -115,7 +115,7 @@ export default function ChatPage({ params }: Props) {
           )}
         </div>
         
-        {/* Optional: More options button */}
+        
         <button className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -123,7 +123,7 @@ export default function ChatPage({ params }: Props) {
         </button>
       </div>
 
-      {/* Chat Messages Component */}
+    
       <ChatMessages conversationId={resolvedParams.chatId} />
     </div>
   );
