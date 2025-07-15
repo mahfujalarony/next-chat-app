@@ -15,7 +15,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/_next/static/(.*)',
+        source: '/_next/static/css/(.*)',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'text/css; charset=utf-8',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/js/(.*)',
         headers: [
           {
             key: 'Content-Type',
