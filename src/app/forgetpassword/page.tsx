@@ -19,7 +19,7 @@ export default function ForgetPasswordPage() {
 
     try {
       await sendPasswordResetEmail(auth, email, {
-        url: "http://localhost:3000/login", // ✅ reset successful হলে এখানে যাবে
+        url: process.env.NEXT_PUBLIC_PASSWORD_RESET_REDIRECT_URL || "http://localhost:3000/login",
       });
 
       setMessage("A password reset link has been sent to your email. Please check your inbox.");

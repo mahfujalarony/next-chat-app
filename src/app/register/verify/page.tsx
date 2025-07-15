@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { auth } from '@/lib/firebase';
 import { applyActionCode, checkActionCode, sendEmailVerification, onAuthStateChanged } from 'firebase/auth';
 
-export default function VerifyEmail() {
+function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState('Verifying your email...');
@@ -13,8 +13,15 @@ export default function VerifyEmail() {
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  if (!auth) {
+    return <div>Firebase not initialized...</div>;
+  }
+
   // Track user authentication state
   useEffect(() => {
+    // auth null check করুন
+    if (!auth) return;
+    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setEmail(user.email || '');
@@ -36,6 +43,13 @@ export default function VerifyEmail() {
   // Email verification handling
   useEffect(() => {
     const verifyEmail = async () => {
+      // auth null check করুন
+      if (!auth) {
+        setStatus('Firebase not initialized');
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const oobCode = searchParams?.get('oobCode');
         const mode = searchParams?.get('mode');
@@ -71,6 +85,12 @@ export default function VerifyEmail() {
 
   // Resend verification email
   const resendVerification = async () => {
+    // auth null check করুন
+    if (!auth) {
+      setStatus('Firebase not initialized');
+      return;
+    }
+
     try {
       setIsLoading(true);
       const user = auth.currentUser;
@@ -89,6 +109,12 @@ export default function VerifyEmail() {
 
   // Proceed to next step
   const handleNextStep = () => {
+    // auth null check করুন
+    if (!auth) {
+      setStatus('Firebase not initialized');
+      return;
+    }
+
     if (auth.currentUser?.emailVerified || isVerified) {
       router.push('/register/step3');
     } else {
@@ -126,7 +152,7 @@ export default function VerifyEmail() {
             </button>
           )}
 
-          {(auth.currentUser?.emailVerified || isVerified) && !isLoading && (
+          {auth && (auth.currentUser?.emailVerified || isVerified) && !isLoading && (
             <button
               onClick={handleNextStep}
               disabled={isLoading}
@@ -140,5 +166,13 @@ export default function VerifyEmail() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmail() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

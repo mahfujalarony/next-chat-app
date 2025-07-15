@@ -9,7 +9,8 @@ export const useSocket = () => {
     // Client-side only
     if (typeof window === 'undefined') return;
 
-    const socketInstance = io("http://localhost:5000", {
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+    const socketInstance = io(socketUrl, {
       autoConnect: true,
     });
 

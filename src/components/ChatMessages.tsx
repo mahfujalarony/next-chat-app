@@ -5,21 +5,17 @@ import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { useSocket } from "@/lib/Hooks/useSocket";
-import axios from "axios";
+import { apiClient } from "@/lib/apiClient";
+import { ENV } from "@/lib/env";
 
-// API client
-const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
-} );
-
-console.log("🌐 API Base URL:", apiClient.defaults.baseURL);
+console.log("🌐 API Base URL:", ENV.API_URL);
 
 // Health check function
 const checkBackendHealth = async () => {
   try {
-    const response = await apiClient.get('/health');
-    console.log("✅ Backend health check successful:", response.data);
-    return true;
+    const result = await apiClient.healthCheck();
+    console.log("✅ Backend health check successful:", result);
+    return result.success;
   } catch (error) {
     console.error("❌ Backend health check failed:", error);
     return false;
@@ -52,7 +48,7 @@ interface ChatMessagesProps {
 const fetchMessages = async (conversationId: string): Promise<Message[]> => {
   console.log("🔍 Fetching messages for conversation:", conversationId);
   try {
-    const { data } = await apiClient.get(`/messages/${conversationId}`);
+    const { data } = await apiClient.messages.getByConversation(conversationId);
     console.log("✅ Messages fetched successfully:", data);
     return data.data;
   } catch (error: any) {
@@ -76,7 +72,7 @@ const fetchMessages = async (conversationId: string): Promise<Message[]> => {
 const fetchMyMongoId = async (firebaseUid: string): Promise<string> => {
   console.log("🔍 Fetching MongoDB ID for firebaseUid:", firebaseUid);
   try {
-    const { data } = await apiClient.get(`/users/getMongoId/${firebaseUid}`);
+    const { data } = await apiClient.users.getMongoId(firebaseUid);
     console.log("✅ MongoDB ID fetched successfully:", data);
     return data.data.mongoId;
   } catch (error: any) {
@@ -90,9 +86,9 @@ const fetchMyMongoId = async (firebaseUid: string): Promise<string> => {
 
 const fetchConversationDetails = async (conversationId: string) => {
   console.log("🔍 Fetching conversation details for:", conversationId);
-  console.log("🌐 Full URL will be:", `${apiClient.defaults.baseURL}/conversations/getConversationById/${conversationId}`);
+  console.log("🌐 Full URL will be:", `${ENV.API_URL}/conversations/getConversationById/${conversationId}`);
   try {
-    const { data } = await apiClient.get(`/conversations/getConversationById/${conversationId}`);
+    const { data } = await apiClient.conversations.getById(conversationId);
     console.log("✅ Conversation details fetched successfully:", data);
     return data.data;
   } catch (error: any) {
@@ -219,7 +215,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = React.memo(({ conversationId }
 
   const handleDeleteMessage = useCallback(async (messageId: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/messages/delete/${messageId}` );
+      await apiClient.messages.delete(messageId);
       queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
     } catch (error) {
       console.error("❌ Failed to delete message:", error);
@@ -266,7 +262,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = React.memo(({ conversationId }
     const typeToSend = fileUrl ? "image" : "text";
 
     try {
-      await apiClient.post("/messages/send", {
+      await apiClient.messages.send({
         senderId: myMongoId,
         conversationId,
         content: newMessage,

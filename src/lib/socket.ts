@@ -1,5 +1,6 @@
 // lib/socket.ts
 import { io, Socket } from "socket.io-client";
+import { ENV } from "./env";
 
 let socket: Socket | null = null;
 
@@ -10,7 +11,7 @@ const getSocket = (): Socket | null => {
   }
 
   if (!socket) {
-    socket = io("http://localhost:5000", {
+    socket = io(ENV.SOCKET_URL, {
       autoConnect: false, 
     });
   }
@@ -18,4 +19,4 @@ const getSocket = (): Socket | null => {
   return socket;
 };
 
-export default getSocket();
+export default getSocket;

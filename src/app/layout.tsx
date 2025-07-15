@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/lib/redux/providers";
+import { validateEnvironment } from "@/lib/env";
+import EnvironmentSwitcher from "@/components/EnvironmentSwitcher";
+
+// Validate environment variables on app start
+if (typeof window === 'undefined') {
+  validateEnvironment();
+}
 
 //import { hydrateRoot } from "react-dom/client";
 
@@ -33,6 +40,7 @@ export default function RootLayout({
       >
         <Providers>
           {children}
+          <EnvironmentSwitcher />
         </Providers>
       </body>
     </html>

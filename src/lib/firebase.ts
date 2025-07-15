@@ -1,7 +1,6 @@
-// src/lib/firebase.ts
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -13,31 +12,16 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase only on the client side
-let app: any = null;
-let auth: any = null;
-let db: any = null;
-let googleProvider: GoogleAuthProvider | null = null;
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
 
 if (typeof window !== 'undefined') {
-  // Client-side initialization
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
   auth = getAuth(app);
   db = getFirestore(app);
-  googleProvider = new GoogleAuthProvider();
 }
 
-// For server-side rendering compatibility
-const initializeFirebase = () => {
-  if (typeof window === 'undefined') return { auth: null, db: null, googleProvider: null };
-  
-  if (!app) {
-    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    auth = getAuth(app);
-    db = getFirestore(app);
-    googleProvider = new GoogleAuthProvider();
-  }
-  
-  return { auth, db, googleProvider };
-};
+export const googleProvider = new GoogleAuthProvider();
 
-export { auth, db, googleProvider, initializeFirebase };
+export { auth, db, signInWithPopup };

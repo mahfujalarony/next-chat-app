@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import socket from "@/lib/socket"; // ← তুমি যেভাবে path সেট করো
+import getSocket from "@/lib/socket"; 
 
 export default function ChatPage() {
   useEffect(() => {
-    socket.connect(); // যদি autoConnect: false দাও
+    const socket = getSocket();
+    
+    if (!socket) return; 
+
+    socket.connect(); 
 
     socket.emit("join", "room123");
 
@@ -14,8 +18,10 @@ export default function ChatPage() {
     });
 
     return () => {
-      socket.off("message"); // event cleanup
-      socket.disconnect();   // optional, যদি বারবার navigate করো
+      if (socket) { // cleanup এর সময়ও null check
+        socket.off("message"); // event cleanup
+        socket.disconnect();   // optional, যদি বারবার navigate করো
+      }
     };
   }, []);
 

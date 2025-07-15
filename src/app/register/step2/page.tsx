@@ -51,7 +51,7 @@ export default function Step2Form() {
 
       // 3. Send verification email with custom redirect
       const actionCodeSettings = {
-        url: `http://localhost:3000/register/verify?email=${encodeURIComponent(email)}`,
+        url: `${process.env.NEXT_PUBLIC_EMAIL_VERIFY_REDIRECT_URL}?email=${encodeURIComponent(email)}`,
         handleCodeInApp: true
       };
       await sendEmailVerification(user, actionCodeSettings);

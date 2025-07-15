@@ -2,6 +2,10 @@ import { auth, googleProvider, signInWithPopup } from '../firebase';
 import { getAdditionalUserInfo } from "firebase/auth";
 
 export async function signInWithGoogle() {
+  if (!auth || !googleProvider) {
+    throw new Error("Firebase is not initialized on the client side.");
+  }
+
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
@@ -9,7 +13,6 @@ export async function signInWithGoogle() {
 
     const isNewUser = additionalInfo?.isNewUser;
 
-    // ✅ Step: MongoDB তে upsert করো
     await fetch('/api/users/upsert', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -27,8 +30,8 @@ export async function signInWithGoogle() {
     console.log(isNewUser ? '🆕 New Google user registered' : '✅ Existing Google user logged in');
 
     return { user, isNewUser };
-  } catch (err: any) {
-    console.error("Google Sign-in Error:", err);
-    throw err;
+  } catch (error: unknown) {
+    console.error("Google Sign-in Error:", error);
+    throw error;
   }
 }
