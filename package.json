@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:clean": "rimraf .next && npm run build"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",
