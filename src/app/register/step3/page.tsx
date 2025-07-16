@@ -61,10 +61,15 @@ const Step3Form: React.FC = () => {
 
       const imageUrl = data.url;
       setUploadedUrl(imageUrl);
+      if(!auth) {
+        setError('Firebase not initialized');
+        return;
+      }
 
       // Update user profile with image URL in Firebase Authentication
       const user = auth.currentUser;
       if (user) {
+
         // MongoDB-তে avatar update
         await fetch('/api/users/upsert', {
           method: 'POST',
@@ -92,7 +97,7 @@ const Step3Form: React.FC = () => {
 
   // Skip button handler
   const handleSkip = () => {
-    router.push('/'); // Redirect to home page if skipped
+    router.push('/chats'); // Redirect to home page if skipped
   };
 
   return (

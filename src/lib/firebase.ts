@@ -24,4 +24,4 @@ if (typeof window !== 'undefined') {
 
 export const googleProvider = new GoogleAuthProvider();
 
-export { auth, db, signInWithPopup };
+export { app, auth, db, signInWithPopup };

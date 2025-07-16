@@ -14,7 +14,7 @@ export default function LoginPage() {
     try {
       const { user, isNewUser } = await signInWithGoogle();
       // Redirect to home after login or registration
-      router.push("/");
+      router.push("/chats");
     } catch (err: any) {
       setError(err.message || "Google login failed!");
     }
@@ -31,7 +31,7 @@ const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
   }
   try {
     await loginWithEmail(email, password);
-    router.push("/");
+    router.push("/chats");
   } catch (err: any) {
     setError(err.message || "Login failed!");
   }

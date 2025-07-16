@@ -17,8 +17,13 @@ export default function useAuthObserver() {
       try {
         const { onAuthStateChanged } = await import('firebase/auth');
         const { auth } = await import('@/lib/firebase');
+        if (!auth) {
+          console.error('Firebase auth not initialized');
+          return;
+        }
 
         unsubscribe = onAuthStateChanged(auth, (user) => {
+          
           if (user) {
             dispatch(setUser({
               uid: user.uid,
