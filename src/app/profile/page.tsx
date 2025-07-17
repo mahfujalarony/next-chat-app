@@ -8,31 +8,38 @@ import { FaArrowLeft, FaUser, FaCalendarAlt, FaClock, FaCheckCircle, FaTimesCirc
 
 export default function ProfilePage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   
   // Handle case where auth is null during initialization
   const [user, loading, error] = useAuthState(auth!);
   const [photo, setPhoto] = useState('/nouser.png');
 
   useEffect(() => {
-    if (user) {
-      console.log('User photoURL:', user.photoURL);
-      console.log('Current photo state:', photo);
-      setPhoto(user.photoURL || '/nouser.png');
-      console.log('Photo state after update:', user.photoURL || '/nouser.png');
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (user && user.photoURL) {
+      setPhoto(user.photoURL);
     }
   }, [user]);
 
   useEffect(() => {
-    if (!loading && !user && auth) {
+    if (mounted && !loading && !user) {
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, mounted]);
 
   const handleBackToChats = () => {
     router.push('/chats');
   };
 
-  // Handle case where auth is null (shouldn't happen on client but for safety)
+  // Don't render anything until component is mounted (client-side only)
+  if (!mounted) {
+    return null;
+  }
+
+  // Handle case where auth is null
   if (!auth) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
@@ -78,17 +85,12 @@ export default function ProfilePage() {
                 src={photo} 
                 alt="Profile"
                 className="w-full h-full object-cover"
-                onLoad={() => {
-                  console.log('Image loaded successfully:', photo);
-                }}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  console.log('Image failed to load:', target.src);
                   if (target.src !== '/nouser.png') {
                     target.onerror = null;
                     target.src = '/nouser.png';
                     setPhoto('/nouser.png');
-                    console.log('Switched to fallback image');
                   }
                 }}
               />
@@ -97,6 +99,14 @@ export default function ProfilePage() {
               {user.displayName || 'No Name'}
             </h1>
             <p className="text-blue-100 mt-1">{user.email}</p>
+          </div>
+
+          {/* Profile Image URL Debug Section */}
+          <div className="p-4 bg-yellow-50 border-b">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Profile Image URL:</h3>
+            <p className="text-xs text-gray-600 break-all bg-white p-2 rounded border">
+              {user.photoURL || 'No photo URL'}
+            </p>
           </div>
 
           {/* Profile Details */}
