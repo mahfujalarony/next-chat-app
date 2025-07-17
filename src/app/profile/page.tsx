@@ -105,13 +105,6 @@ export default function ProfilePage() {
             <p className="text-blue-100 mt-1">{user.email}</p>
           </div>
 
-          {/* Profile Image URL Debug Section */}
-          <div className="p-4 bg-yellow-50 border-b">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Profile Image URL:</h3>
-            <p className="text-xs text-gray-600 break-all bg-white p-2 rounded border">
-              {user.photoURL || 'No photo URL'}
-            </p>
-          </div>
 
           {/* Profile Details */}
           <div className="p-6 space-y-6">
@@ -163,14 +156,25 @@ export default function ProfilePage() {
           </div>
           
           {/* Footer with action buttons */}
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
             <button 
               onClick={handleBackToChats}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2 mb-3"
             >
               <FaArrowLeft className="text-sm" /> Return to Chats
             </button>
-          </div>
+            {/* logout */}
+            <button
+              onClick={async () => {
+              if(!auth)  return ;
+              await auth.signOut();
+              router.push('/');
+              }}
+              className="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2"
+            >
+              <FaTimesCircle className="text-sm" /> Logout
+            </button>
+            </div>
         </div>
       </div>
     </div>
