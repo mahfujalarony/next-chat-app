@@ -23,6 +23,7 @@ export default function Step2Form() {
     const password = (e.currentTarget.elements.namedItem('password') as HTMLInputElement).value;
 
     try {
+      if(!auth) return null;
       // 1. Create user account
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
