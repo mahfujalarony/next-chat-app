@@ -14,6 +14,7 @@ export default function ProfilePage() {
   const [mounted, setMounted] = useState(false);
   
   // Handle case where auth is null during initialization
+  if(typeof window === 'undefined') return null;
   const [user, loading, error] = useAuthState(auth!);
   const [photo, setPhoto] = useState('/nouser.png');
 
