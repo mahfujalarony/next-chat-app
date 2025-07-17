@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
@@ -70,9 +71,9 @@ const ChatListItemSkeleton: React.FC = () => (
 );
 
 // Header Component
-const ChatListHeader: React.FC<{ onNewChat: () => void }> = ({ onNewChat }) => (
+const ChatListHeader: React.FC<{ onNewChat: () => void; onProfileClick: () => void }> = ({ onNewChat, onProfileClick }) => (
   <div className="bg-gray-100 text-gray-800 p-3 flex items-center justify-between border-b">
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 hover:cursor-pointer" onClick={onProfileClick}>
         <FaWhatsapp className="text-green-500 text-3xl" />
         <h1 className="text-xl font-bold">Chats</h1>
     </div>
@@ -263,6 +264,7 @@ const ChatList: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const socket = useSocket();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined" && auth) {
@@ -383,7 +385,10 @@ const ChatList: React.FC = () => {
 
   return (
     <div className="h-screen w-full max-w-md mx-auto flex flex-col bg-white shadow-lg border-r">
-      <ChatListHeader onNewChat={() => setShowContacts(true)} />
+      <ChatListHeader 
+        onNewChat={() => setShowContacts(true)} 
+        onProfileClick={() => router.push("/profile")} 
+      />
       <SearchBar onSearch={setSearchTerm} />
 
       <ContactModal

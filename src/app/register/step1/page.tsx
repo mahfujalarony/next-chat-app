@@ -16,7 +16,7 @@ export default function Step1Form() {
       try {
         const { user, isNewUser } = await signInWithGoogle();
         // Redirect to chat after login or registration
-        router.push("/chat");
+        router.push("/chats");
       } catch (err: any) {
         setError(err.message || "Google login failed!");
       }
